@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alraya Bakery | Online Menu</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #E8C4A3;
+            --secondary: #D4A76A;
+            --accent: #A55C55;
+            --light: #F5E1CE;
+            --dark: #4A2C2A;
+            --text: #333333;
+            --gray: #888888;
+            --white: #FFFFFF;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Montserrat', sans-serif;
+            color: var(--text);
+            background-color: var(--light);
+            line-height: 1.6;
+        }
+        
+        /* Header Styles */
+        header {
+            background: var(--white);
+            box-shadow: var(--shadow);
+            padding: 1rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .logo i {
+            font-size: 2.5rem;
+            color: var(--accent);
+        }
+        
+        .logo h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8rem;
+            color: var(--dark);
+        }
+        
+        .search-container {
+            flex: 1;
+            max-width: 500px;
+            min-width: 250px;
+            position: relative;
+        }
+        
+        .search-container input {
+            width: 100%;
+            padding: 0.8rem 1rem 0.8rem 3rem;
+            border: 2px solid var(--primary);
+            border-radius: 30px;
+            font-size: 1rem;
+            background-color: var(--light);
+            transition: var(--transition);
+        }
+        
+        .search-container input:focus {
+            outline: none;
+            border-color: var(--accent);
+            background-color: var(--white);
+            box-shadow: 0 0 0 3px rgba(165, 92, 85, 0.2);
+        }
+        
+        .search-container i {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--accent);
+            font-size: 1.2rem;
+        }
+        
+        /* Navigation */
+        nav {
+            background: var(--dark);
+            position: sticky;
+            top: 78px;
+            z-index: 99;
+            box-shadow: var(--shadow);
+        }
+        
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+        
+        .category-nav {
+            display: flex;
+            overflow-x: auto;
+            padding: 0.75rem 0;
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        
+        .category-nav::-webkit-scrollbar {
+            display: none;
+        }
+        
+        .category-btn {
+            background: transparent;
+            border: none;
+            color: var(--light);
+            padding: 0.5rem 1.25rem;
+            margin: 0 0.25rem;
+            border-radius: 30px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: var(--transition);
+        }
+        
+        .category-btn:hover, .category-btn.active {
+            background: var(--accent);
+        }
+        
+        /* Main Content */
+        main {
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+        
+        .section-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8rem;
+            color: var(--dark);
+            margin: 2rem 0 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--secondary);
+        }
+        
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 2rem;
+        }
+        
+        /* Menu Item Card */
+        .menu-item {
+            background: var(--white);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            position: relative;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .menu-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.12);
+        }
+        
+        .item-image {
+            height: 200px;
+            overflow: hidden;
+        }
+        
+        .item-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: var(--transition);
+        }
+        
+        .menu-item:hover .item-image img {
+            transform: scale(1.05);
+        }
+        
+        .item-labels {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .item-label {
+            padding: 0.3rem 0.8rem;
+            border-radius: 30px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--white);
+        }
+        
+        .label-new {
+            background: var(--accent);
+        }
+        
+        .label-spicy {
+            background: #E74C3C;
+        }
+        
+        .label-popular {
+            background: #3498DB;
+        }
+        
+        .item-info {
+            padding: 1.5rem;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 0.75rem;
+        }
+        
+        .item-name {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--dark);
+            flex: 1;
+        }
+        
+        .item-price {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--accent);
+            margin-left: 1rem;
+        }
+        
+        .item-desc {
+            color: var(--gray);
+            font-size: 0.9rem;
+            margin-bottom: 1.25rem;
+            flex: 1;
+        }
+        
+        .item-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .out-of-stock {
+            color: #E74C3C;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        
+        .menu-item.out-of-stock-item {
+            opacity: 0.7;
+        }
+        
+        .menu-item.out-of-stock-item .item-image {
+            filter: grayscale(70%);
+        }
+        
+        /* Footer */
+        footer {
+            background: var(--dark);
+            color: var(--light);
+            padding: 3rem 2rem 1.5rem;
+            margin-top: 4rem;
+        }
+        
+        .footer-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+        }
+        
+        .footer-section h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.4rem;
+            margin-bottom: 1.5rem;
+            color: var(--white);
+        }
+        
+        .footer-section p, .footer-section a {
+            color: var(--primary);
+            margin-bottom: 0.75rem;
+            display: block;
+            text-decoration: none;
+            transition: var(--transition);
+        }
+        
+        .footer-section a:hover {
+            color: var(--white);
+        }
+        
+        .social-links {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .social-links a {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--accent);
+            color: var(--white);
+            font-size: 1.2rem;
+            transition: var(--transition);
+        }
+        
+        .social-links a:hover {
+            background: var(--secondary);
+            transform: translateY(-3px);
+        }
+        
+        .copyright {
+            text-align: center;
+            padding-top: 2rem;
+            margin-top: 2rem;
+            border-top: 1px solid rgba(232, 196, 163, 0.3);
+            color: var(--primary);
+            font-size: 0.9rem;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 900px) {
+            .header-content {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .logo {
+                justify-content: center;
+            }
+            
+            nav {
+                top: 140px;
+            }
+            
+            .section-title {
+                font-size: 1.6rem;
+                margin: 1.5rem 0 1rem;
+            }
+        }
+        
+        @media (max-width: 600px) {
+            header, .nav-container, main {
+                padding: 1rem;
+            }
+            
+            .logo h1 {
+                font-size: 1.5rem;
+            }
+            
+            nav {
+                top: 122px;
+            }
+            
+            .menu-grid {
+                gap: 1.5rem;
+            }
+            
+            .item-image {
+                height: 180px;
+            }
+        }
+        
+        /* Loading Animation */
+        .loading {
+            text-align: center;
+            padding: 3rem;
+            font-size: 1.2rem;
+            color: var(--accent);
+        }
+        
+        .loader {
+            width: 48px;
+            height: 48px;
+            border: 5px solid var(--primary);
+            border-bottom-color: var(--accent);
+            border-radius: 50%;
+            display: inline-block;
+            animation: rotation 1s linear infinite;
+            margin-bottom: 1rem;
+        }
+        
+        @keyframes rotation {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header with Logo and Search -->
+    <header>
+        <div class="header-content">
+            <div class="logo">
+                <i class="fas fa-bread-slice"></i>
+                <h1>Alraya Bakery</h1>
+            </div>
+            <div class="search-container">
+                <i class="fas fa-search"></i>
+                <input type="text" id="searchInput" placeholder="Search for pastries, cakes, drinks...">
+            </div>
+        </div>
+    </header>
+    
+    <!-- Sticky Category Navigation -->
+    <nav>
+        <div class="nav-container">
+            <div class="category-nav" id="categoryNav">
+                <!-- Categories will be populated by JavaScript -->
+            </div>
+        </div>
+    </nav>
+    
+    <!-- Main Content Area -->
+    <main>
+        <div class="loading" id="loading">
+            <div class="loader"></div>
+            <p>Loading our delicious menu...</p>
+        </div>
+        
+        <div id="menuContent">
+            <!-- Menu sections will be populated by JavaScript -->
+        </div>
+    </main>
+    
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>Alraya Bakery</h3>
+                <p>Freshly baked goods made with love and the finest ingredients since 2011.</p>
+                <div class="social-links">
+                    <a href="https://www.facebook.com/RayaBakeryJo"><i class="fab fa-facebook-f"></i></a>
+                    <a href="https://www.instagram.com/rayabakeryjo"><i class="fab fa-instagram"></i></a>
+                    
+                </div>
+            </div>
+            
+            <div class="footer-section">
+                <h3>Visit Us</h3>
+                <p><i class="fas fa-map-marker-alt"></i>KING ABDULLAH II STREET, AMMAN</p>
+                <p><i class="fas fa-clock"></i> 7 Days - 24 hours</p>
+            </div>
+            
+            <div class="footer-section">
+                <h3>Contact</h3>
+                <p><i class="fas fa-phone"></i>0797766055</p>
+            </div>
+        </div>
+        
+        <div class="copyright">
+            <p>&copy; 2023 Sweet Delights Bakery. All rights reserved.</p>
+        </div>
+    </footer>
+    
+    <script>
+        // Sample menu data (to be replaced with Google Sheets data)
+        const menuData = [
+            // Bakery
+           
+            {
+                id: 2,
+                name: "weekend combo",
+                description: "50 pices of Pastries",
+                price: 10.00,
+                image: "https://i.ibb.co/wFLYyV4B/MG-0231.jpg",
+                category: "Popular",
+                subcategory: "Pastries",
+                availability: true,
+                labels: ["Spicy"]
+            },
+            {
+                id: 3,
+                name: "weekend combo 2",
+                description: "25 pices of Pastries",
+                price: 6.00,
+                image: "https://i.ibb.co/wFLYyV4B/MG-0231.jpg",
+                category: "Popular",
+                subcategory: "Pastries",
+                availability: true,
+                labels: ["Spicy"]
+            },
+           {
+                id: 13,
+                name: "lotus cake large",
+                description: "enough for 10-12 personse",
+                price: 12.00,
+                image: "https://i.ibb.co/FbWwpDz7/5-S7-A4438-copy.jpg",
+                category: "Popular",
+                subcategory: "cake",
+                availability: true,
+                labels: ["Spicy"]
+            },
+            
+            // GLUTEN-FREE
+            {
+                id: 4,
+                name: "GLUTEN-FREE BREAD",
+                description: "4 PIECES",
+                price: 1.50,
+                image: "https://i.ibb.co/bMybNLb0/Whats-App-Image-2025-06-14-at-7-05-13-PM-7.jpg",
+                category: "GLUTEN-FREE",
+                subcategory: "",
+                availability: true,
+                labels: []
+            },
+            {
+                id: 5,
+                name: "ENGLIESH CAKE GLUTEN-FREE",
+                description: "1 MOLD",
+                price: 2.50,
+                image: "https://i.ibb.co/20MBsmqm/Whats-App-Image-2025-06-14-at-7-05-13-PM.jpg",
+                category: "GLUTEN-FREE",
+                subcategory: "",
+                availability: true,
+                labels: ["Popular"]
+            },
+            // Sandwiches
+            {
+                id: 7,
+                name: "Turkey & Avocado",
+                description: "Sliced turkey, avocado, lettuce, tomato, and mayo",
+                price: 8.95,
+                image: "https://images.unsplash.com/photo-1617196034796-73dfa7b1fd56?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&h=400&q=80",
+                category: "Sandwiches",
+                subcategory: "Cold Sandwiches",
+                availability: true,
+                labels: ["New"]
+            },
+            {
+                id: 8,
+                name: "Ham & Swiss Panini",
+                description: "Black forest ham with melted Swiss cheese on ciabatta",
+                price: 9.25,
+                image: "https://images.unsplash.com/photo-1525351484163-7529414344d8?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&h=400&q=80",
+                category: "Sandwiches",
+                subcategory: "Hot Sandwiches",
+                availability: true,
+                labels: []
+            },
+            {
+                id: 9,
+                name: "Caprese Sandwich",
+                description: "Fresh mozzarella, tomatoes, basil, and balsamic glaze",
+                price: 8.75,
+                image: "https://images.unsplash.com/photo-1550304943-4f24f54ddde9?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&h=400&q=80",
+                category: "Sandwiches",
+                subcategory: "Vegetarian",
+                availability: false,
+                labels: []
+            },
+            
+            // Drinks
+            {
+                id: 10,
+                name: "Cappuccino",
+                description: "Espresso with steamed milk and foam",
+                price: 4.25,
+                image: "https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&h=400&q=80",
+                category: "Drinks",
+                subcategory: "Coffee",
+                availability: true,
+                labels: []
+            },
+            {
+                id: 11,
+                name: "Iced Matcha Latte",
+                description: "Japanese green tea with milk over ice",
+                price: 5.75,
+                image: "https://images.unsplash.com/photo-1559177584-9a34b5a5d4c4?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&h=400&q=80",
+                category: "Drinks",
+                subcategory: "Tea",
+                availability: true,
+                labels: ["New"]
+            },
+            {
+                id: 12,
+                name: "Fresh Orange Juice",
+                description: "Freshly squeezed oranges",
+                price: 4.95,
+                image: "https://images.unsplash.com/photo-1613478223719-2ab802602423?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&h=400&q=80",
+                category: "Drinks",
+                subcategory: "Juices",
+                availability: true,
+                labels: []
+            }
+        ];
+
+        // Google Sheets Integration Script
+        document.addEventListener('DOMContentLoaded', function() {
+            const loadingElement = document.getElementById('loading');
+            const menuContent = document.getElementById('menuContent');
+            const categoryNav = document.getElementById('categoryNav');
+            const searchInput = document.getElementById('searchInput');
+            
+            // Simulate loading data (in real app, this would be from Google Sheets)
+            setTimeout(() => {
+                loadingElement.style.display = 'none';
+                renderMenu(menuData);
+                setupEventListeners();
+            }, 1500);
+            
+            // Render menu items
+            function renderMenu(items) {
+                // Clear existing content
+                menuContent.innerHTML = '';
+                
+                // Group items by category
+                const categories = [...new Set(items.map(item => item.category))];
+                
+                // Create category navigation
+                categoryNav.innerHTML = '';
+                categories.forEach(category => {
+                    const button = document.createElement('button');
+                    button.className = 'category-btn';
+                    button.textContent = category;
+                    button.dataset.category = category;
+                    categoryNav.appendChild(button);
+                });
+                
+                // Set first category as active
+                if (categories.length > 0) {
+                    categoryNav.querySelector('.category-btn').classList.add('active');
+                }
+                
+                // Render each category section
+                categories.forEach(category => {
+                    const section = document.createElement('section');
+                    section.innerHTML = `<h2 class="section-title">${category}</h2>`;
+                    
+                    const grid = document.createElement('div');
+                    grid.className = 'menu-grid';
+                    
+                    // Filter items for this category
+                    const categoryItems = items.filter(item => item.category === category);
+                    
+                    // Create menu items
+                    categoryItems.forEach(item => {
+                        const itemElement = createMenuItem(item);
+                        grid.appendChild(itemElement);
+                    });
+                    
+                    section.appendChild(grid);
+                    menuContent.appendChild(section);
+                });
+            }
+            
+            // Create a menu item element
+            function createMenuItem(item) {
+                const itemElement = document.createElement('div');
+                itemElement.className = `menu-item ${item.availability ? '' : 'out-of-stock-item'}`;
+                
+                // Labels HTML
+                let labelsHTML = '';
+                item.labels.forEach(label => {
+                    let labelClass = 'label-new';
+                    if (label === 'Spicy') labelClass = 'label-spicy';
+                    if (label === 'Popular') labelClass = 'label-popular';
+                    labelsHTML += `<span class="item-label ${labelClass}">${label}</span>`;
+                });
+                
+                itemElement.innerHTML = `
+                    <div class="item-image">
+                        <img src="${item.image}" alt="${item.name}">
+                    </div>
+                    <div class="item-labels">${labelsHTML}</div>
+                    <div class="item-info">
+                        <div class="item-header">
+                            <h3 class="item-name">${item.name}</h3>
+                            <div class="item-price">$${item.price.toFixed(2)}</div>
+                        </div>
+                        <p class="item-desc">${item.description}</p>
+                        <div class="item-footer">
+                            ${!item.availability ? '<div class="out-of-stock">Out of Stock</div>' : ''}
+                        </div>
+                    </div>
+                `;
+                
+                return itemElement;
+            }
+            
+            // Setup event listeners
+            function setupEventListeners() {
+                // Category navigation
+                document.querySelectorAll('.category-btn').forEach(button => {
+                    button.addEventListener('click', function() {
+                        // Remove active class from all buttons
+                        document.querySelectorAll('.category-btn').forEach(btn => {
+                            btn.classList.remove('active');
+                        });
+                        
+                        // Add active class to clicked button
+                        this.classList.add('active');
+                        
+                        // Scroll to the category section
+                        const category = this.dataset.category;
+                        const section = document.querySelector(`.section-title:contains('${category}')`);
+                        if (section) {
+                            section.scrollIntoView({ behavior: 'smooth' });
+                        }
+                    });
+                });
+                
+                // Search functionality
+                searchInput.addEventListener('input', function() {
+                    const searchTerm = this.value.toLowerCase();
+                    
+                    // Filter menu items
+                    const filteredItems = menuData.filter(item => 
+                        item.name.toLowerCase().includes(searchTerm) || 
+                        item.description.toLowerCase().includes(searchTerm) ||
+                        item.category.toLowerCase().includes(searchTerm) ||
+                        item.subcategory.toLowerCase().includes(searchTerm)
+                    );
+                    
+                    // Re-render menu with filtered items
+                    renderMenu(filteredItems);
+                    
+                    // Update category buttons based on visible categories
+                    updateCategoryNav(filteredItems);
+                });
+            }
+            
+            // Update category navigation based on filtered items
+            function updateCategoryNav(items) {
+                const visibleCategories = [...new Set(items.map(item => item.category))];
+                
+                document.querySelectorAll('.category-btn').forEach(button => {
+                    const category = button.dataset.category;
+                    if (visibleCategories.includes(category)) {
+                        button.style.display = 'block';
+                    } else {
+                        button.style.display = 'none';
+                    }
+                });
+            }
+            
+            // Helper function for text contains (used for category scrolling)
+            Element.prototype.contains = function(text) {
+                return this.textContent.includes(text);
+            };
+        });
+    </script>
+</body>
+</html>
