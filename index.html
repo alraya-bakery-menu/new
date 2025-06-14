@@ -29,8 +29,28 @@
         body {
             font-family: 'Montserrat', sans-serif;
             color: var(--text);
-            background-color: var(--light);
+            background: linear-gradient(135deg, #F5E1CE 0%, #f8efe4 100%);
             line-height: 1.6;
+            position: relative;
+            min-height: 100vh;
+        }
+        
+        /* Progress bar */
+        .progress-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: transparent;
+            z-index: 1000;
+        }
+        
+        .progress-bar {
+            height: 4px;
+            background: var(--accent);
+            width: 0%;
+            transition: width 0.3s ease;
         }
         
         /* Header Styles */
@@ -57,17 +77,20 @@
             display: flex;
             align-items: center;
             gap: 0.75rem;
+            animation: fadeInDown 0.8s ease;
         }
         
         .logo i {
             font-size: 2.5rem;
             color: var(--accent);
+            animation: pulse 2s infinite;
         }
         
         .logo h1 {
             font-family: 'Playfair Display', serif;
             font-size: 1.8rem;
             color: var(--dark);
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
         }
         
         .search-container {
@@ -146,6 +169,8 @@
         
         .category-btn:hover, .category-btn.active {
             background: var(--accent);
+            transform: translateY(-2px);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
         }
         
         /* Main Content */
@@ -162,6 +187,17 @@
             margin: 2rem 0 1.5rem;
             padding-bottom: 0.5rem;
             border-bottom: 2px solid var(--secondary);
+            position: relative;
+        }
+        
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 80px;
+            height: 2px;
+            background: var(--accent);
         }
         
         .menu-grid {
@@ -181,16 +217,20 @@
             height: 100%;
             display: flex;
             flex-direction: column;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 0.6s ease forwards;
         }
         
         .menu-item:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.12);
+            transform: translateY(-8px);
+            box-shadow: 0 15px 25px rgba(0, 0, 0, 0.15);
         }
         
         .item-image {
             height: 200px;
             overflow: hidden;
+            position: relative;
         }
         
         .item-image img {
@@ -201,7 +241,7 @@
         }
         
         .menu-item:hover .item-image img {
-            transform: scale(1.05);
+            transform: scale(1.08);
         }
         
         .item-labels {
@@ -210,6 +250,7 @@
             right: 1rem;
             display: flex;
             gap: 0.5rem;
+            z-index: 2;
         }
         
         .item-label {
@@ -277,14 +318,22 @@
             color: #E74C3C;
             font-weight: 600;
             font-size: 0.9rem;
+            background: rgba(231, 76, 60, 0.1);
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
         }
         
         .menu-item.out-of-stock-item {
-            opacity: 0.7;
+            opacity: 0.85;
         }
         
         .menu-item.out-of-stock-item .item-image {
-            filter: grayscale(70%);
+            filter: grayscale(60%);
+        }
+        
+        .menu-item.out-of-stock-item:hover {
+            transform: none;
+            box-shadow: var(--shadow);
         }
         
         /* Footer */
@@ -396,6 +445,10 @@
             .item-image {
                 height: 180px;
             }
+            
+            .section-title {
+                font-size: 1.5rem;
+            }
         }
         
         /* Loading Animation */
@@ -417,13 +470,65 @@
             margin-bottom: 1rem;
         }
         
+        /* Animation Keyframes */
         @keyframes rotation {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        
+        /* No results message */
+        .no-results {
+            text-align: center;
+            padding: 3rem;
+            grid-column: 1 / -1;
+            color: var(--accent);
+            font-size: 1.2rem;
+        }
+        
+        /* Active section highlight */
+        .section-highlight {
+            background: rgba(232, 196, 163, 0.2);
+            border-radius: 8px;
+            padding: 10px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.05);
+            transition: all 0.5s ease;
+        }
     </style>
 </head>
 <body>
+    <!-- Progress bar -->
+    <div class="progress-container">
+        <div class="progress-bar" id="progressBar"></div>
+    </div>
+    
     <!-- Header with Logo and Search -->
     <header>
         <div class="header-content">
@@ -468,19 +573,18 @@
                 <div class="social-links">
                     <a href="https://www.facebook.com/RayaBakeryJo"><i class="fab fa-facebook-f"></i></a>
                     <a href="https://www.instagram.com/rayabakeryjo"><i class="fab fa-instagram"></i></a>
-                    
                 </div>
             </div>
             
             <div class="footer-section">
                 <h3>Visit Us</h3>
-                <p><i class="fas fa-map-marker-alt"></i>KING ABDULLAH II STREET, AMMAN</p>
+                <p><i class="fas fa-map-marker-alt"></i> KING ABDULLAH II STREET, AMMAN</p>
                 <p><i class="fas fa-clock"></i> 7 Days - 24 hours</p>
             </div>
             
             <div class="footer-section">
                 <h3>Contact</h3>
-                <p><i class="fas fa-phone"></i>0797766055</p>
+                <p><i class="fas fa-phone"></i> 0797766055</p>
             </div>
         </div>
         
@@ -493,57 +597,55 @@
         // Sample menu data (to be replaced with Google Sheets data)
         const menuData = [
             // Bakery
-           
             {
                 id: 2,
-                name: "weekend combo",
-                description: "50 pices of Pastries",
+                name: "Weekend Combo",
+                description: "50 pieces of delicious pastries",
                 price: 10.00,
                 image: "https://i.ibb.co/wFLYyV4B/MG-0231.jpg",
                 category: "Popular",
                 subcategory: "Pastries",
                 availability: true,
-                labels: ["Spicy"]
+                labels: ["Popular"]
             },
             {
                 id: 3,
-                name: "weekend combo 2",
-                description: "25 pices of Pastries",
+                name: "Weekend Combo 2",
+                description: "25 pieces of assorted pastries",
                 price: 6.00,
                 image: "https://i.ibb.co/wFLYyV4B/MG-0231.jpg",
                 category: "Popular",
                 subcategory: "Pastries",
                 availability: true,
-                labels: ["Spicy"]
+                labels: ["Popular"]
             },
-           {
+            {
                 id: 13,
-                name: "lotus cake large",
-                description: "enough for 10-12 personse",
+                name: "Lotus Cake (Large)",
+                description: "Enough for 10-12 persons",
                 price: 12.00,
                 image: "https://i.ibb.co/FbWwpDz7/5-S7-A4438-copy.jpg",
                 category: "Popular",
-                subcategory: "cake",
+                subcategory: "Cake",
                 availability: true,
-                labels: ["Spicy"]
+                labels: ["Popular"]
             },
-            
             // GLUTEN-FREE
             {
                 id: 4,
-                name: "GLUTEN-FREE BREAD",
-                description: "4 PIECES",
+                name: "Gluten-Free Bread",
+                description: "4 pieces of freshly baked bread",
                 price: 1.50,
                 image: "https://i.ibb.co/bMybNLb0/Whats-App-Image-2025-06-14-at-7-05-13-PM-7.jpg",
                 category: "GLUTEN-FREE",
                 subcategory: "",
                 availability: true,
-                labels: []
+                labels: ["New"]
             },
             {
                 id: 5,
-                name: "ENGLIESH CAKE GLUTEN-FREE",
-                description: "1 MOLD",
+                name: "English Cake (Gluten-Free)",
+                description: "1 mold of delicious cake",
                 price: 2.50,
                 image: "https://i.ibb.co/20MBsmqm/Whats-App-Image-2025-06-14-at-7-05-13-PM.jpg",
                 category: "GLUTEN-FREE",
@@ -551,38 +653,39 @@
                 availability: true,
                 labels: ["Popular"]
             },
+            // WAFFLE & CREPE
             {
                 id: 656,
-                name: "nutella waffle",
-                description: "1 pice",
+                name: "Nutella Waffle",
+                description: "1 piece with rich Nutella topping",
                 price: 2.00,
                 image: "https://i.postimg.cc/wvLr3Wy7/IMG-0009-copy.jpg",
                 category: "WAFFLE & CREPE",
                 subcategory: "",
                 availability: true,
-                labels: [""]
+                labels: []
             },
             {
                 id: 686,
-                name: "MIX WAFFLE",
-                description: "1 pice",
+                name: "Mix Waffle",
+                description: "1 piece with assorted toppings",
                 price: 2.00,
                 image: "https://i.postimg.cc/TPZSd8Pz/IMG-0007-copy.jpg",
                 category: "WAFFLE & CREPE",
                 subcategory: "",
                 availability: true,
-                labels: [""]
+                labels: []
             },
             {
-                id: 686,
-                name: "LOTUS CREPE",
-                description: "1 pice",
+                id: 687,
+                name: "Lotus Crepe",
+                description: "1 piece with Lotus spread",
                 price: 2.00,
                 image: "https://i.postimg.cc/650Dd1HZ/IMG-0015-copy.jpg",
                 category: "WAFFLE & CREPE",
                 subcategory: "",
                 availability: false,
-                labels: [""]
+                labels: ["Popular"]
             },
         ];
 
@@ -592,12 +695,18 @@
             const menuContent = document.getElementById('menuContent');
             const categoryNav = document.getElementById('categoryNav');
             const searchInput = document.getElementById('searchInput');
+            const progressBar = document.getElementById('progressBar');
+            
+            // Track active section for highlighting
+            let activeSection = null;
             
             // Simulate loading data (in real app, this would be from Google Sheets)
             setTimeout(() => {
                 loadingElement.style.display = 'none';
                 renderMenu(menuData);
                 setupEventListeners();
+                setupScrollProgress();
+                setupScrollSpy();
             }, 1500);
             
             // Render menu items
@@ -618,14 +727,25 @@
                     categoryNav.appendChild(button);
                 });
                 
-                // Set first category as active
+                // Set first category as active if there are categories
                 if (categories.length > 0) {
                     categoryNav.querySelector('.category-btn').classList.add('active');
                 }
                 
+                // Check if we have any items to display
+                if (items.length === 0) {
+                    const noResults = document.createElement('div');
+                    noResults.className = 'no-results';
+                    noResults.innerHTML = '<i class="fas fa-search"></i><p>No items found. Try another search term.</p>';
+                    menuContent.appendChild(noResults);
+                    return;
+                }
+                
                 // Render each category section
                 categories.forEach(category => {
+                    const sectionId = category.toLowerCase().replace(/\s+/g, '-');
                     const section = document.createElement('section');
+                    section.id = sectionId;
                     section.innerHTML = `<h2 class="section-title">${category}</h2>`;
                     
                     const grid = document.createElement('div');
@@ -635,8 +755,8 @@
                     const categoryItems = items.filter(item => item.category === category);
                     
                     // Create menu items
-                    categoryItems.forEach(item => {
-                        const itemElement = createMenuItem(item);
+                    categoryItems.forEach((item, index) => {
+                        const itemElement = createMenuItem(item, index);
                         grid.appendChild(itemElement);
                     });
                     
@@ -646,22 +766,23 @@
             }
             
             // Create a menu item element
-            function createMenuItem(item) {
+            function createMenuItem(item, index) {
                 const itemElement = document.createElement('div');
                 itemElement.className = `menu-item ${item.availability ? '' : 'out-of-stock-item'}`;
+                itemElement.style.animationDelay = `${index * 0.1}s`;
                 
                 // Labels HTML
                 let labelsHTML = '';
                 item.labels.forEach(label => {
                     let labelClass = 'label-new';
-                    if (label === 'Spicy') labelClass = 'label-spicy';
-                    if (label === 'Popular') labelClass = 'label-popular';
+                    if (label.toLowerCase() === 'spicy') labelClass = 'label-spicy';
+                    if (label.toLowerCase() === 'popular') labelClass = 'label-popular';
                     labelsHTML += `<span class="item-label ${labelClass}">${label}</span>`;
                 });
                 
                 itemElement.innerHTML = `
                     <div class="item-image">
-                        <img src="${item.image}" alt="${item.name}">
+                        <img src="${item.image}" alt="${item.name}" loading="lazy">
                     </div>
                     <div class="item-labels">${labelsHTML}</div>
                     <div class="item-info">
@@ -694,16 +815,53 @@
                         
                         // Scroll to the category section
                         const category = this.dataset.category;
-                        const section = document.querySelector(`.section-title:contains('${category}')`);
+                        const sectionId = category.toLowerCase().replace(/\s+/g, '-');
+                        const section = document.getElementById(sectionId);
+                        
                         if (section) {
-                            section.scrollIntoView({ behavior: 'smooth' });
+                            // Remove any existing highlights
+                            if (activeSection) {
+                                activeSection.classList.remove('section-highlight');
+                            }
+                            
+                            // Scroll to section
+                            section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                            
+                            // Add highlight
+                            section.classList.add('section-highlight');
+                            activeSection = section;
+                            
+                            // Remove highlight after 2 seconds
+                            setTimeout(() => {
+                                if (activeSection) {
+                                    activeSection.classList.remove('section-highlight');
+                                }
+                            }, 2000);
                         }
                     });
                 });
                 
-                // Search functionality
-                searchInput.addEventListener('input', function() {
-                    const searchTerm = this.value.toLowerCase();
+                // Debounce function for search
+                function debounce(func, wait) {
+                    let timeout;
+                    return function() {
+                        const context = this;
+                        const args = arguments;
+                        clearTimeout(timeout);
+                        timeout = setTimeout(() => {
+                            func.apply(context, args);
+                        }, wait);
+                    };
+                }
+                
+                // Search functionality with debounce
+                searchInput.addEventListener('input', debounce(function() {
+                    const searchTerm = this.value.trim().toLowerCase();
+                    
+                    if (searchTerm === '') {
+                        renderMenu(menuData);
+                        return;
+                    }
                     
                     // Filter menu items
                     const filteredItems = menuData.filter(item => 
@@ -718,7 +876,7 @@
                     
                     // Update category buttons based on visible categories
                     updateCategoryNav(filteredItems);
-                });
+                }, 300));
             }
             
             // Update category navigation based on filtered items
@@ -733,12 +891,53 @@
                         button.style.display = 'none';
                     }
                 });
+                
+                // Reset active class to first visible button
+                const visibleButtons = document.querySelectorAll('.category-btn[style="display: block;"]');
+                if (visibleButtons.length > 0) {
+                    document.querySelectorAll('.category-btn').forEach(btn => {
+                        btn.classList.remove('active');
+                    });
+                    visibleButtons[0].classList.add('active');
+                }
             }
             
-            // Helper function for text contains (used for category scrolling)
-            Element.prototype.contains = function(text) {
-                return this.textContent.includes(text);
-            };
+            // Setup scroll progress bar
+            function setupScrollProgress() {
+                window.addEventListener('scroll', () => {
+                    const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+                    const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+                    const scrolled = (winScroll / height) * 100;
+                    progressBar.style.width = scrolled + '%';
+                });
+            }
+            
+            // Setup scroll spy to highlight current section
+            function setupScrollSpy() {
+                const sections = document.querySelectorAll('section');
+                
+                window.addEventListener('scroll', () => {
+                    let current = '';
+                    
+                    sections.forEach(section => {
+                        const sectionTop = section.offsetTop;
+                        const sectionHeight = section.clientHeight;
+                        if (window.pageYOffset >= (sectionTop - 100)) {
+                            current = section.getAttribute('id');
+                        }
+                    });
+                    
+                    // Update active navigation button
+                    if (current) {
+                        document.querySelectorAll('.category-btn').forEach(btn => {
+                            btn.classList.remove('active');
+                            if (btn.dataset.category.toLowerCase().replace(/\s+/g, '-') === current) {
+                                btn.classList.add('active');
+                            }
+                        });
+                    }
+                });
+            }
         });
     </script>
 </body>
