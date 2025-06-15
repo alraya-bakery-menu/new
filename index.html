@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alraya Bakery | Online Menu</title>
+    <title>مخبز الراية | القائمة الإلكترونية</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700&display=swap" rel="stylesheet">
     <style>
         :root {
             --primary: #E8C4A3;
@@ -27,30 +27,14 @@
         }
         
         body {
-            font-family: 'Montserrat', sans-serif;
+            font-family: 'Tajawal', sans-serif;
             color: var(--text);
             background: linear-gradient(135deg, #F5E1CE 0%, #f8efe4 100%);
             line-height: 1.6;
             position: relative;
             min-height: 100vh;
-        }
-        
-        /* Progress bar */
-        .progress-container {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 4px;
-            background: transparent;
-            z-index: 1000;
-        }
-        
-        .progress-bar {
-            height: 4px;
-            background: var(--accent);
-            width: 0%;
-            transition: width 0.3s ease;
+            display: flex;
+            flex-direction: column;
         }
         
         /* Header Styles */
@@ -61,6 +45,7 @@
             position: sticky;
             top: 0;
             z-index: 100;
+            transition: var(--transition);
         }
         
         .header-content {
@@ -87,7 +72,6 @@
         }
         
         .logo h1 {
-            font-family: 'Playfair Display', serif;
             font-size: 1.8rem;
             color: var(--dark);
             text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
@@ -102,12 +86,13 @@
         
         .search-container input {
             width: 100%;
-            padding: 0.8rem 1rem 0.8rem 3rem;
+            padding: 0.8rem 3rem 0.8rem 1rem;
             border: 2px solid var(--primary);
             border-radius: 30px;
             font-size: 1rem;
             background-color: var(--light);
             transition: var(--transition);
+            font-family: 'Tajawal', sans-serif;
         }
         
         .search-container input:focus {
@@ -117,13 +102,31 @@
             box-shadow: 0 0 0 3px rgba(165, 92, 85, 0.2);
         }
         
-        .search-container i {
+        .search-container .search-icon {
             position: absolute;
-            left: 1rem;
+            right: 1rem;
             top: 50%;
             transform: translateY(-50%);
             color: var(--accent);
             font-size: 1.2rem;
+        }
+        
+        .search-container .clear-search {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            background: transparent;
+            border: none;
+            color: var(--gray);
+            font-size: 1.2rem;
+            cursor: pointer;
+            opacity: 0;
+            transition: var(--transition);
+        }
+        
+        .search-container input:not(:placeholder-shown) + .clear-search {
+            opacity: 1;
         }
         
         /* Navigation */
@@ -145,12 +148,22 @@
             display: flex;
             overflow-x: auto;
             padding: 0.75rem 0;
-            -ms-overflow-style: none;
-            scrollbar-width: none;
+            scrollbar-width: thin;
+            scrollbar-color: var(--primary) var(--light);
         }
         
         .category-nav::-webkit-scrollbar {
-            display: none;
+            height: 6px;
+        }
+        
+        .category-nav::-webkit-scrollbar-track {
+            background: var(--light);
+            border-radius: 10px;
+        }
+        
+        .category-nav::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 10px;
         }
         
         .category-btn {
@@ -165,6 +178,8 @@
             cursor: pointer;
             white-space: nowrap;
             transition: var(--transition);
+            position: relative;
+            flex-shrink: 0;
         }
         
         .category-btn:hover, .category-btn.active {
@@ -173,15 +188,28 @@
             box-shadow: 0 2px 8px rgba(0,0,0,0.2);
         }
         
+        .category-btn.active::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 6px;
+            height: 6px;
+            background: var(--primary);
+            border-radius: 50%;
+        }
+        
         /* Main Content */
         main {
             max-width: 1400px;
             margin: 2rem auto;
             padding: 0 2rem;
+            flex: 1;
+            width: 100%;
         }
         
         .section-title {
-            font-family: 'Playfair Display', serif;
             font-size: 1.8rem;
             color: var(--dark);
             margin: 2rem 0 1.5rem;
@@ -194,7 +222,7 @@
             content: '';
             position: absolute;
             bottom: -2px;
-            left: 0;
+            right: 0;
             width: 80px;
             height: 2px;
             background: var(--accent);
@@ -206,7 +234,7 @@
             gap: 2rem;
         }
         
-        /* Menu Item Card */
+        /* Menu Item Card - تحسينات على البطاقات */
         .menu-item {
             background: var(--white);
             border-radius: 12px;
@@ -220,23 +248,27 @@
             opacity: 0;
             transform: translateY(20px);
             animation: fadeInUp 0.6s ease forwards;
+            border: 1px solid rgba(212, 167, 106, 0.2);
         }
         
         .menu-item:hover {
             transform: translateY(-8px);
             box-shadow: 0 15px 25px rgba(0, 0, 0, 0.15);
+            border-color: rgba(165, 92, 85, 0.3);
         }
         
         .item-image {
-            height: 200px;
+            height: 220px;
             overflow: hidden;
             position: relative;
+            background: linear-gradient(to bottom, #f8f4ef, #f1e6d8);
         }
         
         .item-image img {
             width: 100%;
             height: 100%;
             object-fit: cover;
+            object-position: center;
             transition: var(--transition);
         }
         
@@ -247,7 +279,7 @@
         .item-labels {
             position: absolute;
             top: 1rem;
-            right: 1rem;
+            left: 1rem;
             display: flex;
             gap: 0.5rem;
             z-index: 2;
@@ -259,6 +291,7 @@
             font-size: 0.75rem;
             font-weight: 600;
             color: var(--white);
+            text-shadow: 0 1px 1px rgba(0,0,0,0.2);
         }
         
         .label-new {
@@ -271,6 +304,10 @@
         
         .label-popular {
             background: #3498DB;
+        }
+        
+        .label-discount {
+            background: #27AE60;
         }
         
         .item-info {
@@ -306,6 +343,7 @@
             font-size: 0.9rem;
             margin-bottom: 1.25rem;
             flex: 1;
+            line-height: 1.7;
         }
         
         .item-footer {
@@ -336,6 +374,17 @@
             box-shadow: var(--shadow);
         }
         
+        .item-rating {
+            display: flex;
+            margin-top: 0.5rem;
+        }
+        
+        .item-rating i {
+            color: #FFD700;
+            font-size: 0.9rem;
+            margin-left: 0.15rem;
+        }
+        
         /* Footer */
         footer {
             background: var(--dark);
@@ -353,7 +402,6 @@
         }
         
         .footer-section h3 {
-            font-family: 'Playfair Display', serif;
             font-size: 1.4rem;
             margin-bottom: 1.5rem;
             color: var(--white);
@@ -404,6 +452,32 @@
             font-size: 0.9rem;
         }
         
+        /* Back to top button */
+        .back-to-top {
+            position: fixed;
+            bottom: 30px;
+            left: 30px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: var(--accent);
+            color: white;
+            border: none;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 100;
+            transition: var(--transition);
+        }
+        
+        .back-to-top:hover {
+            background: var(--dark);
+            transform: translateY(-3px);
+        }
+        
         /* Responsive Design */
         @media (max-width: 900px) {
             .header-content {
@@ -413,6 +487,7 @@
             
             .logo {
                 justify-content: center;
+                margin-bottom: 0.5rem;
             }
             
             nav {
@@ -439,7 +514,8 @@
             }
             
             .menu-grid {
-                gap: 1.5rem;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 1rem;
             }
             
             .item-image {
@@ -448,6 +524,41 @@
             
             .section-title {
                 font-size: 1.5rem;
+                margin: 1.5rem 0 1rem;
+            }
+            
+            .item-info {
+                padding: 1rem;
+            }
+            
+            .item-name {
+                font-size: 1.1rem;
+            }
+            
+            .item-price {
+                font-size: 1.1rem;
+                margin-left: 0.5rem;
+            }
+            
+            .item-desc {
+                font-size: 0.85rem;
+                margin-bottom: 1rem;
+            }
+            
+            .category-btn {
+                padding: 0.4rem 1rem;
+                font-size: 0.9rem;
+            }
+        }
+        
+        @media (max-width: 400px) {
+            .menu-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+            
+            .item-image {
+                height: 200px;
             }
         }
         
@@ -521,24 +632,41 @@
             box-shadow: 0 0 15px rgba(0,0,0,0.05);
             transition: all 0.5s ease;
         }
+        
+        .category-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            gap: 1rem;
+        }
+        
+        .category-icon {
+            background: var(--primary);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: var(--dark);
+        }
     </style>
 </head>
 <body>
-    <!-- Progress bar -->
-    <div class="progress-container">
-        <div class="progress-bar" id="progressBar"></div>
-    </div>
-    
     <!-- Header with Logo and Search -->
     <header>
         <div class="header-content">
             <div class="logo">
                 <i class="fas fa-bread-slice"></i>
-                <h1>Alraya Bakery</h1>
+                <h1>مخبز الراية</h1>
             </div>
             <div class="search-container">
-                <i class="fas fa-search"></i>
-                <input type="text" id="searchInput" placeholder="Search for pastries, cakes, drinks...">
+                <input type="text" id="searchInput" placeholder="ابحث عن المعجنات، الكيك، المشروبات...">
+                <button id="clearSearch" class="clear-search" title="مسح البحث">
+                    <i class="fas fa-times"></i>
+                </button>
+                <i class="fas fa-search search-icon"></i>
             </div>
         </div>
     </header>
@@ -556,7 +684,7 @@
     <main>
         <div class="loading" id="loading">
             <div class="loader"></div>
-            <p>Loading our delicious menu...</p>
+            <p>جاري تحميل القائمة اللذيذة...</p>
         </div>
         
         <div id="menuContent">
@@ -568,8 +696,8 @@
     <footer>
         <div class="footer-content">
             <div class="footer-section">
-                <h3>Alraya Bakery</h3>
-                <p>Freshly baked goods made with love and the finest ingredients since 2011.</p>
+                <h3>مخبز الراية</h3>
+                <p>منتجات طازجة مصنوعة بحب وبأجود المكونات منذ 2011.</p>
                 <div class="social-links">
                     <a href="https://www.facebook.com/RayaBakeryJo"><i class="fab fa-facebook-f"></i></a>
                     <a href="https://www.instagram.com/rayabakeryjo"><i class="fab fa-instagram"></i></a>
@@ -577,137 +705,91 @@
             </div>
             
             <div class="footer-section">
-                <h3>Visit Us</h3>
-                <p><i class="fas fa-map-marker-alt"></i> KING ABDULLAH II STREET, AMMAN</p>
-                <p><i class="fas fa-clock"></i> 7 Days - 24 hours</p>
+                <h3>زيارتنا</h3>
+                <p><i class="fas fa-map-marker-alt"></i> شارع الملك عبدالله الثاني، عمان</p>
+                <p><i class="fas fa-clock"></i> 7 أيام - 24 ساعة</p>
             </div>
             
             <div class="footer-section">
-                <h3>Contact</h3>
+                <h3>اتصل بنا</h3>
                 <p><i class="fas fa-phone"></i> 0797766055</p>
+                <p><i class="fas fa-envelope"></i> info@alraya-bakery.com</p>
             </div>
         </div>
         
         <div class="copyright">
-            <p>&copy; 2023 Sweet Delights Bakery. All rights reserved.</p>
+            <p>© 2023 مخبز الراية. جميع الحقوق محفوظة.</p>
         </div>
     </footer>
     
+    <button id="backToTop" class="back-to-top" title="العودة للأعلى">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+    
     <script>
-        // Sample menu data (to be replaced with Google Sheets data)
-        const menuData = [
-            // Bakery
-            {
-                id: 2,
-                name: "Weekend Combo",
-                description: "50 pieces of delicious pastries",
-                price: 10.00,
-                image: "https://i.ibb.co/wFLYyV4B/MG-0231.jpg",
-                category: "Popular",
-                subcategory: "Pastries",
-                availability: true,
-                labels: ["Popular"]
-            },
-            {
-                id: 3,
-                name: "Weekend Combo 2",
-                description: "25 pieces of assorted pastries",
-                price: 6.00,
-                image: "https://i.ibb.co/wFLYyV4B/MG-0231.jpg",
-                category: "Popular",
-                subcategory: "Pastries",
-                availability: true,
-                labels: ["Popular"]
-            },
-            {
-                id: 13,
-                name: "Lotus Cake (Large)",
-                description: "Enough for 10-12 persons",
-                price: 12.00,
-                image: "https://i.ibb.co/FbWwpDz7/5-S7-A4438-copy.jpg",
-                category: "Popular",
-                subcategory: "Cake",
-                availability: true,
-                labels: ["Popular"]
-            },
-            // GLUTEN-FREE
-            {
-                id: 4,
-                name: "Gluten-Free Bread",
-                description: "4 pieces of freshly baked bread",
-                price: 1.50,
-                image: "https://i.ibb.co/bMybNLb0/Whats-App-Image-2025-06-14-at-7-05-13-PM-7.jpg",
-                category: "GLUTEN-FREE",
-                subcategory: "",
-                availability: true,
-                labels: ["New"]
-            },
-            {
-                id: 5,
-                name: "English Cake (Gluten-Free)",
-                description: "1 mold of delicious cake",
-                price: 2.50,
-                image: "https://i.ibb.co/20MBsmqm/Whats-App-Image-2025-06-14-at-7-05-13-PM.jpg",
-                category: "GLUTEN-FREE",
-                subcategory: "",
-                availability: true,
-                labels: ["Popular"]
-            },
-            // WAFFLE & CREPE
-            {
-                id: 656,
-                name: "Nutella Waffle",
-                description: "1 piece with rich Nutella topping",
-                price: 2.00,
-                image: "https://i.postimg.cc/wvLr3Wy7/IMG-0009-copy.jpg",
-                category: "WAFFLE & CREPE",
-                subcategory: "",
-                availability: true,
-                labels: []
-            },
-            {
-                id: 686,
-                name: "Mix Waffle",
-                description: "1 piece with assorted toppings",
-                price: 2.00,
-                image: "https://i.postimg.cc/TPZSd8Pz/IMG-0007-copy.jpg",
-                category: "WAFFLE & CREPE",
-                subcategory: "",
-                availability: true,
-                labels: []
-            },
-            {
-                id: 687,
-                name: "Lotus Crepe",
-                description: "1 piece with Lotus spread",
-                price: 2.00,
-                image: "https://i.postimg.cc/650Dd1HZ/IMG-0015-copy.jpg",
-                category: "WAFFLE & CREPE",
-                subcategory: "",
-                availability: false,
-                labels: ["Popular"]
-            },
-        ];
-
         // Google Sheets Integration Script
         document.addEventListener('DOMContentLoaded', function() {
             const loadingElement = document.getElementById('loading');
             const menuContent = document.getElementById('menuContent');
             const categoryNav = document.getElementById('categoryNav');
             const searchInput = document.getElementById('searchInput');
-            const progressBar = document.getElementById('progressBar');
+            const clearSearchBtn = document.getElementById('clearSearch');
+            const backToTopBtn = document.getElementById('backToTop');
+            
+            // **********************************************
+            // مكان وضع رابط جوجل شيت في الكود
+            // قم بوضع رابط نشر Google Apps Script هنا
+            const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwU_WeGezmzYsj5AjJOgmeLvnaVcm5Yp6Xgp0KOuYPajDi4jSMseJ4FMfNtbveQ_ehCwA/exec";
+            // **********************************************
             
             // Track active section for highlighting
             let activeSection = null;
+            let menuData = [];
             
-            // Simulate loading data (in real app, this would be from Google Sheets)
-            setTimeout(() => {
-                loadingElement.style.display = 'none';
-                renderMenu(menuData);
-                setupEventListeners();
-                setupScrollProgress();
-                setupScrollSpy();
-            }, 1500);
+            // Fetch menu data from Google Sheets
+            async function fetchMenuData() {
+                loadingElement.style.display = 'block';
+                menuContent.innerHTML = '';
+                
+                try {
+                    const response = await fetch(GOOGLE_SCRIPT_URL);
+                    
+                    if (!response.ok) {
+                        throw new Error(`خطأ في جلب البيانات: ${response.status} ${response.statusText}`);
+                    }
+                    
+                    const data = await response.json();
+                    
+                    if (!Array.isArray(data)) {
+                        throw new Error('البيانات المستلمة ليست في الشكل المتوقع');
+                    }
+                    
+                    if (data.length === 0) {
+                        throw new Error('لم يتم العثور على بيانات في الجدول');
+                    }
+                    
+                    menuData = data;
+                    loadingElement.style.display = 'none';
+                    renderMenu(menuData);
+                    setupEventListeners();
+                    setupScrollSpy();
+                } catch (error) {
+                    loadingElement.style.display = 'none';
+                    console.error('Error fetching data:', error);
+                    
+                    // Show error in menu content
+                    menuContent.innerHTML = `
+                        <div class="no-results">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <p>حدث خطأ في جلب البيانات: ${error.message}</p>
+                            <p>يرجى التحقق من رابط Google Apps Script في الكود</p>
+                        </div>
+                    `;
+                }
+            }
+            
+            // Load data on page load
+            fetchMenuData();
             
             // Render menu items
             function renderMenu(items) {
@@ -736,7 +818,7 @@
                 if (items.length === 0) {
                     const noResults = document.createElement('div');
                     noResults.className = 'no-results';
-                    noResults.innerHTML = '<i class="fas fa-search"></i><p>No items found. Try another search term.</p>';
+                    noResults.innerHTML = '<i class="fas fa-search"></i><p>لم يتم العثور على منتجات. حاول استخدام مصطلح بحث آخر.</p>';
                     menuContent.appendChild(noResults);
                     return;
                 }
@@ -746,7 +828,16 @@
                     const sectionId = category.toLowerCase().replace(/\s+/g, '-');
                     const section = document.createElement('section');
                     section.id = sectionId;
-                    section.innerHTML = `<h2 class="section-title">${category}</h2>`;
+                    
+                    // Category header with icon
+                    section.innerHTML = `
+                        <div class="category-header">
+                            <div class="category-icon">
+                                <i class="${getCategoryIcon(category)}"></i>
+                            </div>
+                            <h2 class="section-title">${category}</h2>
+                        </div>
+                    `;
                     
                     const grid = document.createElement('div');
                     grid.className = 'menu-grid';
@@ -765,6 +856,18 @@
                 });
             }
             
+            // Get icon for category
+            function getCategoryIcon(category) {
+                switch(category) {
+                    case 'الأكثر مبيعاً': return 'fas fa-star';
+                    case 'خالي من الجلوتين': return 'fas fa-seedling';
+                    case 'وافل وكريب': return 'fas fa-pancakes';
+                    case 'مشروبات': return 'fas fa-coffee';
+                    case 'حلويات': return 'fas fa-cookie';
+                    default: return 'fas fa-bread-slice';
+                }
+            }
+            
             // Create a menu item element
             function createMenuItem(item, index) {
                 const itemElement = document.createElement('div');
@@ -773,26 +876,54 @@
                 
                 // Labels HTML
                 let labelsHTML = '';
-                item.labels.forEach(label => {
-                    let labelClass = 'label-new';
-                    if (label.toLowerCase() === 'spicy') labelClass = 'label-spicy';
-                    if (label.toLowerCase() === 'popular') labelClass = 'label-popular';
-                    labelsHTML += `<span class="item-label ${labelClass}">${label}</span>`;
-                });
+                if (item.labels && Array.isArray(item.labels)) {
+                    item.labels.forEach(label => {
+                        let labelClass = 'label-new';
+                        if (label === 'spicy' || label === 'حار') labelClass = 'label-spicy';
+                        if (label === 'الأكثر مبيعاً' || label === 'popular') labelClass = 'label-popular';
+                        if (label === 'خصم' || label === 'discount') labelClass = 'label-discount';
+                        labelsHTML += `<span class="item-label ${labelClass}">${label}</span>`;
+                    });
+                }
+                
+                // Rating stars
+                let ratingHTML = '';
+                const rating = item.rating || 0;
+                const fullStars = Math.floor(rating);
+                const halfStar = (rating - fullStars) >= 0.5;
+                
+                for (let i = 0; i < fullStars; i++) {
+                    ratingHTML += '<i class="fas fa-star"></i>';
+                }
+                
+                if (halfStar) {
+                    ratingHTML += '<i class="fas fa-star-half-alt"></i>';
+                }
+                
+                const emptyStars = 5 - fullStars - (halfStar ? 1 : 0);
+                for (let i = 0; i < emptyStars; i++) {
+                    ratingHTML += '<i class="far fa-star"></i>';
+                }
+                
+                // Handle missing images
+                const imageUrl = item.image || 'https://i.ibb.co/7JfqX5s/no-image.jpg';
                 
                 itemElement.innerHTML = `
                     <div class="item-image">
-                        <img src="${item.image}" alt="${item.name}" loading="lazy">
+                        <img src="${imageUrl}" alt="${item.name}" loading="lazy">
                     </div>
                     <div class="item-labels">${labelsHTML}</div>
                     <div class="item-info">
                         <div class="item-header">
                             <h3 class="item-name">${item.name}</h3>
-                            <div class="item-price">$${item.price.toFixed(2)}</div>
+                            <div class="item-price">
+                                $${(item.price || 0).toFixed(2)}
+                            </div>
                         </div>
-                        <p class="item-desc">${item.description}</p>
+                        <p class="item-desc">${item.description || 'لا يوجد وصف'}</p>
+                        ${rating > 0 ? `<div class="item-rating">${ratingHTML}</div>` : ''}
                         <div class="item-footer">
-                            ${!item.availability ? '<div class="out-of-stock">Out of Stock</div>' : ''}
+                            ${!item.availability ? '<div class="out-of-stock">غير متوفر</div>' : ''}
                         </div>
                     </div>
                 `;
@@ -865,10 +996,9 @@
                     
                     // Filter menu items
                     const filteredItems = menuData.filter(item => 
-                        item.name.toLowerCase().includes(searchTerm) || 
-                        item.description.toLowerCase().includes(searchTerm) ||
-                        item.category.toLowerCase().includes(searchTerm) ||
-                        item.subcategory.toLowerCase().includes(searchTerm)
+                        (item.name && item.name.toLowerCase().includes(searchTerm)) || 
+                        (item.description && item.description.toLowerCase().includes(searchTerm)) ||
+                        (item.category && item.category.toLowerCase().includes(searchTerm))
                     );
                     
                     // Re-render menu with filtered items
@@ -877,6 +1007,27 @@
                     // Update category buttons based on visible categories
                     updateCategoryNav(filteredItems);
                 }, 300));
+                
+                // Clear search button
+                clearSearchBtn.addEventListener('click', function() {
+                    searchInput.value = '';
+                    renderMenu(menuData);
+                    updateCategoryNav(menuData);
+                    searchInput.focus();
+                });
+                
+                // Back to top button
+                window.addEventListener('scroll', () => {
+                    if (window.pageYOffset > 300) {
+                        backToTopBtn.style.display = 'flex';
+                    } else {
+                        backToTopBtn.style.display = 'none';
+                    }
+                });
+                
+                backToTopBtn.addEventListener('click', () => {
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                });
             }
             
             // Update category navigation based on filtered items
@@ -900,16 +1051,6 @@
                     });
                     visibleButtons[0].classList.add('active');
                 }
-            }
-            
-            // Setup scroll progress bar
-            function setupScrollProgress() {
-                window.addEventListener('scroll', () => {
-                    const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
-                    const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
-                    const scrolled = (winScroll / height) * 100;
-                    progressBar.style.width = scrolled + '%';
-                });
             }
             
             // Setup scroll spy to highlight current section
