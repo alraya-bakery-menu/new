@@ -142,22 +142,35 @@
             max-width: 1400px;
             margin: 0 auto;
             padding: 0 2rem;
+            position: relative;
         }
         
         .category-nav {
             display: flex;
             overflow-x: auto;
-            padding: 0.75rem 0;
+            padding: 0.75rem 0 1.5rem;
             scrollbar-width: thin;
             scrollbar-color: var(--primary) var(--light);
+            position: relative;
+        }
+        
+        .scroll-indicator {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            height: 4px;
+            background: var(--accent);
+            border-radius: 2px;
+            transition: width 0.3s ease, transform 0.3s ease;
+            z-index: 10;
         }
         
         .category-nav::-webkit-scrollbar {
-            height: 6px;
+            height: 8px;
         }
         
         .category-nav::-webkit-scrollbar-track {
-            background: var(--light);
+            background: rgba(255, 255, 255, 0.1);
             border-radius: 10px;
         }
         
@@ -166,11 +179,15 @@
             border-radius: 10px;
         }
         
+        .category-nav::-webkit-scrollbar-thumb:hover {
+            background: var(--accent);
+        }
+        
         .category-btn {
             background: transparent;
             border: none;
             color: var(--light);
-            padding: 0.5rem 1.25rem;
+            padding: 0.7rem 1.5rem;
             margin: 0 0.25rem;
             border-radius: 30px;
             font-size: 0.95rem;
@@ -262,6 +279,9 @@
             overflow: hidden;
             position: relative;
             background: linear-gradient(to bottom, #f8f4ef, #f1e6d8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         
         .item-image img {
@@ -270,6 +290,18 @@
             object-fit: cover;
             object-position: center;
             transition: var(--transition);
+        }
+        
+        .no-image-placeholder {
+            text-align: center;
+            padding: 1rem;
+            color: var(--accent);
+        }
+        
+        .no-image-placeholder i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: var(--secondary);
         }
         
         .menu-item:hover .item-image img {
@@ -651,6 +683,44 @@
             font-size: 1.5rem;
             color: var(--dark);
         }
+        
+        /* New styles for search and navigation */
+        .search-results-info {
+            background: var(--white);
+            padding: 1rem;
+            border-radius: 10px;
+            margin: 1rem 0;
+            box-shadow: var(--shadow);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .search-results-info .results-count {
+            font-weight: 600;
+            color: var(--accent);
+        }
+        
+        .scroll-indicator {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            height: 4px;
+            background: var(--accent);
+            border-radius: 2px;
+            transition: width 0.3s ease, transform 0.3s ease;
+            z-index: 10;
+        }
+        
+        .category-btn.highlight {
+            animation: highlightPulse 1.5s ease 2;
+        }
+        
+        @keyframes highlightPulse {
+            0% { box-shadow: 0 0 0 0 rgba(165, 92, 85, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(165, 92, 85, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(165, 92, 85, 0); }
+        }
     </style>
 </head>
 <body>
@@ -676,6 +746,7 @@
         <div class="nav-container">
             <div class="category-nav" id="categoryNav">
                 <!-- Categories will be populated by JavaScript -->
+                <div class="scroll-indicator" id="scrollIndicator"></div>
             </div>
         </div>
     </nav>
@@ -685,6 +756,13 @@
         <div class="loading" id="loading">
             <div class="loader"></div>
             <p>جاري تحميل القائمة اللذيذة...</p>
+        </div>
+        
+        <div id="searchResultsInfo" class="search-results-info" style="display: none;">
+            <div class="results-count" id="resultsCount"></div>
+            <button id="clearSearchResults" class="clear-search" style="position: static; opacity: 1;">
+                <i class="fas fa-times"></i> مسح نتائج البحث
+            </button>
         </div>
         
         <div id="menuContent">
@@ -735,16 +813,36 @@
             const searchInput = document.getElementById('searchInput');
             const clearSearchBtn = document.getElementById('clearSearch');
             const backToTopBtn = document.getElementById('backToTop');
+            const resultsInfo = document.getElementById('searchResultsInfo');
+            const resultsCount = document.getElementById('resultsCount');
+            const clearSearchResultsBtn = document.getElementById('clearSearchResults');
+            const scrollIndicator = document.getElementById('scrollIndicator');
             
             // **********************************************
             // مكان وضع رابط جوجل شيت في الكود
             // قم بوضع رابط نشر Google Apps Script هنا
-            const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwU_WeGezmzYsj5AjJOgmeLvnaVcm5Yp6Xgp0KOuYPajDi4jSMseJ4FMfNtbveQ_ehCwA/exec";
+            const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbww7lcWs_0perJbphln6g3ocH0Zm7HqOqLn-MvLWw-bvlpN1foxvUSmCBNMinW0EiKo9A/exec";
             // **********************************************
             
             // Track active section for highlighting
             let activeSection = null;
             let menuData = [];
+            let originalMenuData = [];
+            let isSearching = false;
+            
+            // Function to convert Google Drive links to direct image links
+            function convertDriveLink(url) {
+                if (!url) return null;
+                
+                // Check if it's a Google Drive link
+                if (url.includes('drive.google.com')) {
+                    const match = url.match(/\/d\/([^\/]+)/);
+                    if (match && match[1]) {
+                        return `https://drive.google.com/uc?export=view&id=${match[1]}`;
+                    }
+                }
+                return url;
+            }
             
             // Fetch menu data from Google Sheets
             async function fetchMenuData() {
@@ -768,11 +866,20 @@
                         throw new Error('لم يتم العثور على بيانات في الجدول');
                     }
                     
-                    menuData = data;
+                    // Process image URLs
+                    menuData = data.map(item => {
+                        return {
+                            ...item,
+                            image: convertDriveLink(item.image)
+                        };
+                    });
+                    
+                    originalMenuData = [...menuData];
                     loadingElement.style.display = 'none';
                     renderMenu(menuData);
                     setupEventListeners();
                     setupScrollSpy();
+                    setupScrollIndicator();
                 } catch (error) {
                     loadingElement.style.display = 'none';
                     console.error('Error fetching data:', error);
@@ -800,7 +907,7 @@
                 const categories = [...new Set(items.map(item => item.category))];
                 
                 // Create category navigation
-                categoryNav.innerHTML = '';
+                categoryNav.innerHTML = '<div class="scroll-indicator" id="scrollIndicator"></div>';
                 categories.forEach(category => {
                     const button = document.createElement('button');
                     button.className = 'category-btn';
@@ -813,6 +920,9 @@
                 if (categories.length > 0) {
                     categoryNav.querySelector('.category-btn').classList.add('active');
                 }
+                
+                // Update scroll indicator
+                setupScrollIndicator();
                 
                 // Check if we have any items to display
                 if (items.length === 0) {
@@ -906,11 +1016,16 @@
                 }
                 
                 // Handle missing images
-                const imageUrl = item.image || 'https://i.ibb.co/7JfqX5s/no-image.jpg';
+                const imageContent = item.image 
+                    ? `<img src="${item.image}" alt="${item.name}" loading="lazy">`
+                    : `<div class="no-image-placeholder">
+                          <i class="fas fa-image"></i>
+                          <p>لا توجد صورة متاحة</p>
+                       </div>`;
                 
                 itemElement.innerHTML = `
                     <div class="item-image">
-                        <img src="${imageUrl}" alt="${item.name}" loading="lazy">
+                        ${imageContent}
                     </div>
                     <div class="item-labels">${labelsHTML}</div>
                     <div class="item-info">
@@ -990,27 +1105,55 @@
                     const searchTerm = this.value.trim().toLowerCase();
                     
                     if (searchTerm === '') {
+                        resultsInfo.style.display = 'none';
+                        isSearching = false;
                         renderMenu(menuData);
                         return;
                     }
                     
-                    // Filter menu items
-                    const filteredItems = menuData.filter(item => 
-                        (item.name && item.name.toLowerCase().includes(searchTerm)) || 
-                        (item.description && item.description.toLowerCase().includes(searchTerm)) ||
-                        (item.category && item.category.toLowerCase().includes(searchTerm))
-                    );
+                    // Show searching indicator
+                    loadingElement.style.display = 'block';
+                    menuContent.innerHTML = '';
+                    resultsInfo.style.display = 'none';
                     
-                    // Re-render menu with filtered items
-                    renderMenu(filteredItems);
-                    
-                    // Update category buttons based on visible categories
-                    updateCategoryNav(filteredItems);
+                    setTimeout(() => {
+                        // Filter menu items
+                        const filteredItems = menuData.filter(item => 
+                            (item.name && item.name.toLowerCase().includes(searchTerm)) || 
+                            (item.description && item.description.toLowerCase().includes(searchTerm)) ||
+                            (item.category && item.category.toLowerCase().includes(searchTerm))
+                        );
+                        
+                        // Update results info
+                        resultsInfo.style.display = 'flex';
+                        resultsCount.textContent = `عرض ${filteredItems.length} نتيجة بحث عن "${searchTerm}"`;
+                        
+                        // Re-render menu with filtered items
+                        renderMenu(filteredItems);
+                        isSearching = true;
+                        
+                        // Update category buttons based on visible categories
+                        updateCategoryNav(filteredItems);
+                        
+                        loadingElement.style.display = 'none';
+                    }, 500);
                 }, 300));
                 
                 // Clear search button
                 clearSearchBtn.addEventListener('click', function() {
                     searchInput.value = '';
+                    resultsInfo.style.display = 'none';
+                    isSearching = false;
+                    renderMenu(menuData);
+                    updateCategoryNav(menuData);
+                    searchInput.focus();
+                });
+                
+                // Clear search results button
+                clearSearchResultsBtn.addEventListener('click', function() {
+                    searchInput.value = '';
+                    resultsInfo.style.display = 'none';
+                    isSearching = false;
                     renderMenu(menuData);
                     updateCategoryNav(menuData);
                     searchInput.focus();
@@ -1028,6 +1171,9 @@
                 backToTopBtn.addEventListener('click', () => {
                     window.scrollTo({ top: 0, behavior: 'smooth' });
                 });
+                
+                // Update scroll indicator on scroll
+                categoryNav.addEventListener('scroll', updateScrollIndicator);
             }
             
             // Update category navigation based on filtered items
@@ -1038,6 +1184,14 @@
                     const category = button.dataset.category;
                     if (visibleCategories.includes(category)) {
                         button.style.display = 'block';
+                        
+                        // Highlight category if it matches search
+                        if (isSearching) {
+                            button.classList.add('highlight');
+                            setTimeout(() => {
+                                button.classList.remove('highlight');
+                            }, 3000);
+                        }
                     } else {
                         button.style.display = 'none';
                     }
@@ -1051,6 +1205,9 @@
                     });
                     visibleButtons[0].classList.add('active');
                 }
+                
+                // Update scroll indicator
+                updateScrollIndicator();
             }
             
             // Setup scroll spy to highlight current section
@@ -1074,10 +1231,42 @@
                             btn.classList.remove('active');
                             if (btn.dataset.category.toLowerCase().replace(/\s+/g, '-') === current) {
                                 btn.classList.add('active');
+                                
+                                // Scroll category into view
+                                const navRect = categoryNav.getBoundingClientRect();
+                                const btnRect = btn.getBoundingClientRect();
+                                
+                                if (btnRect.left < navRect.left || btnRect.right > navRect.right) {
+                                    btn.scrollIntoView({ behavior: 'smooth', inline: 'center' });
+                                }
                             }
                         });
                     }
                 });
+            }
+            
+            // Setup scroll indicator for category nav
+            function setupScrollIndicator() {
+                const scrollIndicator = document.getElementById('scrollIndicator');
+                if (!scrollIndicator) return;
+                
+                // Calculate the width of the scroll indicator
+                const scrollWidth = categoryNav.scrollWidth - categoryNav.clientWidth;
+                const indicatorWidth = (categoryNav.clientWidth / categoryNav.scrollWidth) * 100;
+                
+                scrollIndicator.style.width = `${indicatorWidth}%`;
+                updateScrollIndicator();
+            }
+            
+            // Update scroll indicator position
+            function updateScrollIndicator() {
+                const scrollIndicator = document.getElementById('scrollIndicator');
+                if (!scrollIndicator) return;
+                
+                const scrollPercentage = categoryNav.scrollLeft / (categoryNav.scrollWidth - categoryNav.clientWidth);
+                const maxLeft = categoryNav.clientWidth - scrollIndicator.clientWidth;
+                
+                scrollIndicator.style.transform = `translateX(${scrollPercentage * maxLeft}px)`;
             }
         });
     </script>
