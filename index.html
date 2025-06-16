@@ -522,8 +522,24 @@
             margin: 0 auto;
         }
         
-        /* التصميم المتجاوب */
+        /* التصميم المتجاوب - تحسينات للأجهزة المحمولة */
         @media (max-width: 768px) {
+            /* إصلاح تحول الجسم عند فتح القائمة الجانبية */
+            body.sidebar-open {
+                transform: none;
+                overflow: hidden;
+            }
+            
+            /* تثبيت القائمة الجانبية للأجهزة المحمولة */
+            .sidebar {
+                width: 85%;
+                right: -85%;
+            }
+            
+            .sidebar.active {
+                right: 0;
+            }
+            
             .modal-body {
                 grid-template-columns: 1fr;
             }
@@ -535,6 +551,37 @@
             
             .search-box {
                 min-width: 100%;
+            }
+            
+            /* تحسينات إضافية للهيدر على الجوال */
+            .contact-info {
+                display: none;
+            }
+            
+            .logo h1 {
+                font-size: 1.3rem;
+            }
+            
+            /* تحسين عرض المنتجات على الجوال */
+            .products-grid {
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+                gap: 15px;
+            }
+            
+            .product-image {
+                height: 170px;
+            }
+            
+            .product-name {
+                font-size: 1rem;
+            }
+            
+            .product-description {
+                font-size: 0.85rem;
+            }
+            
+            .product-price {
+                font-size: 1.1rem;
             }
         }
         
@@ -555,9 +602,43 @@
                 font-size: 1.2rem;
             }
             
-            .contact-info p {
-                font-size: 0.9rem;
+            /* تحسينات إضافية للجوال الصغير */
+            .search-filter {
+                padding: 10px;
+                margin: 10px auto;
             }
+            
+            .section-title {
+                font-size: 1.4rem;
+                margin: 15px 0;
+            }
+            
+            .product-card {
+                margin: 0 5px;
+            }
+        }
+        
+        /* إصلاح تنسيق الصور في نافذة المنتج على الجوال */
+        @media (max-width: 768px) {
+            .modal-images {
+                text-align: center;
+            }
+            
+            .modal-main-image {
+                max-width: 100%;
+                height: auto;
+                max-height: 250px;
+            }
+            
+            .modal-image-thumbnails {
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+        }
+        
+        /* إصلاح مشكلة التمرير على الجوال عند فتح القائمة الجانبية */
+        .no-scroll {
+            overflow: hidden;
         }
     </style>
 </head>
@@ -574,7 +655,7 @@
             </div>
         </div>
         <div class="contact-info">
-            <p><i class="fas fa-phone"></i> </p>
+            <p><i class="fas fa-phone"></i> 0791234567</p>
         </div>
     </header>
     
@@ -663,6 +744,8 @@
         // جلب المنتجات من Google Sheets
         function fetchProducts() {
             const apiUrl = 'https://script.google.com/macros/s/AKfycbww7lcWs_0perJbphln6g3ocH0Zm7HqOqLn-MvLWw-bvlpN1foxvUSmCBNMinW0EiKo9A/exec';
+            
+            loadingElement.style.display = 'block';
             
             fetch(apiUrl)
                 .then(response => response.json())
@@ -791,6 +874,7 @@
             // إغلاق القائمة الجانبية
             sidebar.classList.remove('active');
             document.body.classList.remove('sidebar-open');
+            document.body.classList.remove('no-scroll');
         }
         
         // إعداد مستمعات الأحداث
@@ -817,11 +901,13 @@
             menuToggle.addEventListener('click', () => {
                 sidebar.classList.toggle('active');
                 document.body.classList.toggle('sidebar-open');
+                document.body.classList.toggle('no-scroll');
             });
             
             sidebarClose.addEventListener('click', () => {
                 sidebar.classList.remove('active');
                 document.body.classList.remove('sidebar-open');
+                document.body.classList.remove('no-scroll');
             });
         }
         
